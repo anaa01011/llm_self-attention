@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Deep Reasoning LLM
 
 A state-of-the-art transformer-based language model focused on deep reasoning and chain-of-thought capabilities.
@@ -70,3 +71,7 @@ python scripts/train.py --config configs/base_config.yaml
 ## License
 
 MIT License
+=======
+# llm_self-attention
+created a 128million parameters thinking model from scratch with training from scratch loss convergence moving average plates to 1.9 on 25k 8 batch training. this is a scalable upto billions of parameters just change the configuration in base-config.yaml  &amp; use scaling_preset.yaml remember the model needs more training since we use randomization.
+>>>>>>> 7cc2b760938a382bd277aaca66f6b679900efe50
