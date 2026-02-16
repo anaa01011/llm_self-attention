@@ -1,0 +1,151 @@
+# Quick Test Configuration - Small training run for validation
+# Based on base_config.yaml but with reduced parameters for quick testing
+
+model:
+  # Architecture parameters (same as base)
+  hidden_size: 768
+  num_hidden_layers: 12
+  num_attention_heads: 12
+  num_key_value_heads: 4        # GQA: 3:1 ratio (12 Q heads / 4 KV heads) - Llama 3 style
+  intermediate_size: 3072
+  vocab_size: 16000             # Matching trained tokenizer
+  max_position_embeddings: 512
+  
+  # Dropout and regularization
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  layer_norm_eps: 1.0e-12
+  
+  # Activation function
+  hidden_act: "swiglu"
+  
+  # Flash Attention 2 (PyTorch SDPA)
+  use_flash_attention: true
+  
+  # Initialization
+  initializer_range: 0.02
+  
+  # Model type
+  model_type: "reasoning_transformer"
+  use_cache: true
+  
+  # Reasoning-specific
+  enable_reasoning_tokens: true
+  reasoning_depth: 3
+
+tokenizer:
+  type: "sentencepiece"
+  model_type: "unigram"
+  vocab_size: 16000
+  character_coverage: 0.9995
+  pad_token: "<pad>"
+  unk_token: "<unk>"
+  bos_token: "<s>"
+  eos_token: "</s>"
+  
+  # Reasoning-specific tokens
+  special_tokens:
+    - "<think>"
+    - "</think>"
+    - "<step>"
+    - "<conclusion>"
+
+training:
+  # Basic training params
+  batch_size: 16                 # Smaller batch for faster iteration
+  gradient_accumulation_steps: 2
+  effective_batch_size: 16
+  
+  # Learning rate
+  learning_rate: 3.0e-4
+  lr_scheduler: "cosine"
+  warmup_steps: 20              # Reduced warmup
+  min_lr: 3.0e-5
+  
+  # Optimization
+  optimizer: "adamw"
+  weight_decay: 0.01
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1.0e-8
+  max_grad_norm: 1.0
+  
+  # Training duration
+  max_steps: 29000               # Continue to 29000 steps total
+  eval_steps: 50                # Eval + sample generation every 50 steps
+  save_steps: 29000              # Save checkpoints at end
+  logging_steps: 20             # Log every 20 steps
+  
+  # Mixed precision
+  fp16: false
+  bf16: true
+  
+  # Distributed training
+  use_ddp: false                # Disable for single GPU testing
+  local_rank: -1
+
+data:
+  # Data paths
+  train_data_path: "data/train"
+  eval_data_path: "data/eval"
+  max_train_examples: 1000      # Load 1000 lines total
+  skip_train_examples: 0        # Skip first N examples (0=start from beginning, 1000=next batch)
+  max_tokens_per_chunk: 512     # Group lines into 512-token chunks with shuffling
+  
+  # Data processing
+  num_workers: 2                # Reduced workers
+  preprocessing_num_workers: 4
+  max_seq_length: 512
+  
+  # Data mixing
+  reasoning_data_weight: 0.5
+  general_data_weight: 0.3
+  code_data_weight: 0.2
+  
+  # Quality filtering
+  min_text_length: 50
+  max_text_length: 100000
+
+checkpointing:
+  output_dir: "checkpoints/test_run"
+  save_total_limit: 1           # Keep only 1 latest checkpoint (minimal Mac storage)
+  resume_from_checkpoint: "checkpoints/test_run/final"  # Resume from previous training
+  
+  # HuggingFace Hub upload (auto-backup to cloud - REQUIRED)
+  hub_upload_enabled: true
+  hub_repo_id: "anaa01011/reasoning-llm-checkpoints"  # Your HF repo
+  hub_token: "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"
+  cleanup_after_upload: true    # ✅ Delete local checkpoint after upload (saves Mac storage)
+  force_cleanup: true           # ✅ Always cleanup, even if upload fails
+
+logging:
+  log_dir: "logs/test_run"
+  wandb_project: "deep-reasoning-llm-test"
+  wandb_enabled: false
+  tensorboard_enabled: true
+
+# Expert Iteration Settings (Self-Improving Training)
+expert_iteration:
+  enabled: true                  # Enable expert iteration training
+  
+  # Generation settings
+  num_samples: 0                 # 0 = Supervised learning only (no sample generation)
+  keep_top_k: 1                  # Keep top K for training (50% filter)
+  temperature: 0.8               # Sampling temperature (0.8 = diverse)
+  max_length: 256                # Max generation length
+  
+  # Verification settings
+  verification_mode: "dataset"   # "dataset" (early) or "automatic" (later)
+  similarity_threshold: 0.4      # Min similarity to reference (dataset mode)
+  min_quality_score: 0.5         # Min score to accept sample
+  use_math_verifier: false       # Use specialized math verification
+  
+  # Mode switching (QUALITY-BASED)
+  min_acceptance_rate_for_switch: 0.96  # Switch when acceptance rate > 96%
+  min_steps_before_switch: 50    # Don't switch before this many steps
+  
+  # Logging
+  log_samples: true              # Log generated samples for debugging
+  log_interval: 10               # Log every N steps
+  
+seed: 42

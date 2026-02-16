@@ -1,0 +1,144 @@
+# Base Model Configuration for Deep Reasoning LLM
+
+model:
+  # Architecture parameters
+  hidden_size: 768              # Hidden dimension
+  num_hidden_layers: 12         # Number of transformer layers
+  num_attention_heads: 12       # Number of attention heads
+  num_key_value_heads: 4        # GQA: 3:1 ratio (12 Q heads / 4 KV heads) - Llama 3 style
+  intermediate_size: 3072       # FFN intermediate size (4 * hidden_size)
+  vocab_size: 16000            # Vocabulary size (trained tokenizer)
+  max_position_embeddings: 512 # Maximum sequence length
+  
+  # Dropout and regularization
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  layer_norm_eps: 1.0e-12
+  
+  # Activation function (SwiGLU is superior to GELU)
+  hidden_act: "swiglu"
+  
+  # Initialization
+  initializer_range: 0.02
+  
+  # Model type
+  model_type: "reasoning_transformer"
+  use_cache: true
+  
+  # Reasoning-specific
+  enable_reasoning_tokens: true  # Add special tokens for chain-of-thought
+  reasoning_depth: 3             # Maximum reasoning steps
+
+tokenizer:
+  type: "sentencepiece"
+  model_type: "unigram"
+  vocab_size: 16000
+  character_coverage: 0.9995
+  pad_token: "<pad>"
+  unk_token: "<unk>"
+  bos_token: "<s>"
+  eos_token: "</s>"
+  
+  # Reasoning-specific tokens
+  special_tokens:
+    - "<think>"       # Start of reasoning
+    - "</think>"      # End of reasoning
+    - "<step>"        # Reasoning step separator
+    - "<conclusion>"  # Final answer marker
+
+training:
+  # Basic training params
+  batch_size: 32
+  gradient_accumulation_steps: 4
+  effective_batch_size: 128  # batch_size * gradient_accumulation_steps
+  
+  # Learning rate
+  learning_rate: 3.0e-4
+  lr_scheduler: "cosine"
+  warmup_steps: 2000
+  min_lr: 3.0e-5
+  
+  # Optimization
+  optimizer: "adamw"
+  weight_decay: 0.01
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1.0e-8
+  max_grad_norm: 1.0
+  
+  # Training duration
+  max_steps: 500000
+  eval_steps: 1000
+  save_steps: 5000
+  logging_steps: 100
+  
+  # Mixed precision
+  fp16: false
+  bf16: true  # Use bfloat16 if available
+  
+  # Distributed training
+  use_ddp: true
+  local_rank: -1
+
+data:
+  # Data paths
+  train_data_path: "data/train"
+  eval_data_path: "data/eval"
+  
+  # Data processing
+  num_workers: 4
+  preprocessing_num_workers: 8
+  max_seq_length: 512
+  
+  # Data mixing (for different dataset types)
+  reasoning_data_weight: 0.5     # Chain-of-thought data
+  general_data_weight: 0.3       # General text
+  code_data_weight: 0.2          # Code for logical reasoning
+  
+  # Quality filtering
+  min_text_length: 50
+  max_text_length: 100000
+
+checkpointing:
+  output_dir: "checkpoints/"
+  save_total_limit: 1           # Keep only 1 checkpoint (minimal local storage)
+  resume_from_checkpoint: null   # Path to resume from
+  
+  # HuggingFace Hub upload (RECOMMENDED for Mac - saves disk space)
+  hub_upload_enabled: true       # Auto-upload checkpoints to cloud
+  hub_repo_id: "anaa01011/reasoning-llm-checkpoints"  # Your HF repo
+  hub_token: "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"  # Your token
+  cleanup_after_upload: true     # ✅ Delete local checkpoint after upload
+  force_cleanup: true            # ✅ Always cleanup to save Mac storage
+
+logging:
+  log_dir: "logs/"
+  wandb_project: "deep-reasoning-llm"
+  wandb_enabled: false
+  tensorboard_enabled: true
+
+# Expert Iteration Settings (Self-Improving Training)
+expert_iteration:
+  enabled: true                  # Enable expert iteration training
+  
+  # Generation settings
+  num_samples: 6                 # Generate K samples per question
+  keep_top_k: 3                  # Keep top K for training (50% filter)
+  temperature: 0.8               # Sampling temperature (0.8 = diverse)
+  max_length: 256                # Max generation length
+  
+  # Verification settings
+  verification_mode: "dataset"   # "dataset" (early) or "automatic" (later)
+  similarity_threshold: 0.4      # Min similarity to reference (dataset mode)
+  min_quality_score: 0.5         # Min score to accept sample
+  use_math_verifier: false       # Use specialized math verification
+  
+  # Mode switching (QUALITY-BASED)
+  min_acceptance_rate_for_switch: 0.96  # Switch when acceptance rate > 96%
+  min_steps_before_switch: 500   # Don't switch before this many steps (for full training)
+  
+  # Logging
+  log_samples: true              # Log generated samples for debugging
+  log_interval: 10               # Log every N steps
+  
+seed: 42

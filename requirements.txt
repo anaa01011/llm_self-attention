@@ -1,0 +1,37 @@
+# Deep Reasoning LLM - Essential Requirements
+# Python 3.8+
+
+# Core ML libraries
+torch>=2.0.0
+transformers>=4.35.0
+datasets>=2.14.0
+
+# Tokenizer
+sentencepiece>=0.1.99
+
+# Training utilities
+accelerate>=0.24.0
+tensorboard>=2.14.0
+
+# Data processing
+numpy>=1.24.0
+
+# Configuration
+pyyaml>=6.0
+
+# Progress bars
+tqdm>=4.65.0
+
+# Development tools (optional)
+pytest>=7.4.0
+black>=23.7.0
+flake8>=6.1.0
+isort>=5.12.0
+
+# Optional packages (install separately if needed):
+# wandb>=0.15.0              # Weights & Biases logging
+# jupyter>=1.0.0             # Jupyter notebooks
+# ipykernel>=6.25.0          # Jupyter kernel
+# flash-attn>=2.3.0          # Flash Attention (requires CUDA)
+# deepspeed>=0.11.0          # DeepSpeed distributed training
+# fairscale>=0.4.13          # FairScale utilities
