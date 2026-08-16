@@ -208,12 +208,12 @@ def calculate_flops_per_token(
 if __name__ == "__main__":
     # Test utilities
     set_seed(42)
-    print("✓ Seed set")
+    print(" Seed set")
     
     # Test parameter counting
     test_model = torch.nn.Linear(100, 10)
     params = count_parameters(test_model)
-    print(f"✓ Test model parameters: {params}")
+    print(f" Test model parameters: {params}")
     
     # Test time formatting
-    print(f"✓ Format time: {format_time(3661)}")
+    print(f" Test time formatting: {format_time(3661)}")

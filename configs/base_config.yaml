@@ -48,8 +48,8 @@ tokenizer:
 
 training:
   # Basic training params
-  batch_size: 32
-  gradient_accumulation_steps: 4
+  batch_size: 2                   # Reduced for MPS memory (8.5GB needed at bs=8, limit=9GB)
+  gradient_accumulation_steps: 64  # 2 × 64 = 128 effective batch size
   effective_batch_size: 128  # batch_size * gradient_accumulation_steps
   
   # Learning rate
@@ -66,18 +66,19 @@ training:
   adam_epsilon: 1.0e-8
   max_grad_norm: 1.0
   
-  # Training duration
-  max_steps: 500000
-  eval_steps: 1000
-  save_steps: 5000
-  logging_steps: 100
+  # Training duration (17,803 examples, batch=8 → ~2,225 steps/epoch)
+  # 25,000 steps ≈ 11 epochs; ~21h on MPS at ~3s/step
+  max_steps: 25000
+  eval_steps: 250
+  save_steps: 2500
+  logging_steps: 25
   
   # Mixed precision
   fp16: false
   bf16: true  # Use bfloat16 if available
   
   # Distributed training
-  use_ddp: true
+  use_ddp: false
   local_rank: -1
 
 data:
@@ -86,7 +87,7 @@ data:
   eval_data_path: "data/eval"
   
   # Data processing
-  num_workers: 4
+  num_workers: 0              # 0 = main process only; avoids MPS+multiprocessing issues on Mac
   preprocessing_num_workers: 8
   max_seq_length: 512
   
@@ -101,15 +102,15 @@ data:
 
 checkpointing:
   output_dir: "checkpoints/"
-  save_total_limit: 1           # Keep only 1 checkpoint (minimal local storage)
+  save_total_limit: 2           # Keep last 2 checkpoints
   resume_from_checkpoint: null   # Path to resume from
   
   # HuggingFace Hub upload (RECOMMENDED for Mac - saves disk space)
-  hub_upload_enabled: true       # Auto-upload checkpoints to cloud
+  hub_upload_enabled: true       # Token loaded from .env → HF_TOKEN env var
   hub_repo_id: "anaa01011/reasoning-llm-checkpoints"  # Your HF repo
-  hub_token: "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"  # Your token
-  cleanup_after_upload: true     # ✅ Delete local checkpoint after upload
-  force_cleanup: true            # ✅ Always cleanup to save Mac storage
+  hub_token: ""                  # Left empty - read from HF_TOKEN env var
+  cleanup_after_upload: false    # Keep local checkpoints
+  force_cleanup: false           # Do NOT delete checkpoints on failed upload
 
 logging:
   log_dir: "logs/"

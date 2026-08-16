@@ -22,7 +22,7 @@ def test_hub_upload():
     checkpoint_path = "checkpoints/test_run/checkpoint-200"
     
     if not Path(checkpoint_path).exists():
-        print(f"❌ Checkpoint not found: {checkpoint_path}")
+        print(f" Checkpoint not found: {checkpoint_path}")
         print("Please run training first to create checkpoints")
         return
     
@@ -59,7 +59,7 @@ def test_hub_upload():
         print("=" * 60)
         
     except Exception as e:
-        print(f"\n❌ Upload failed: {e}")
+        print(f"\n Upload failed: {e}")
         print("\nTroubleshooting:")
         print("1. Check your token is valid: https://huggingface.co/settings/tokens")
         print("2. Make sure you're logged in: huggingface-cli login")

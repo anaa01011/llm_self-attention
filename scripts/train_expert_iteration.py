@@ -438,7 +438,7 @@ def train_expert_iteration(config: Dict):
             current_acceptance_rate >= min_acceptance and 
             ei_trainer.verifier.mode == 'dataset'):
             logger.info("="*80)
-            logger.info(f"🎯 QUALITY THRESHOLD REACHED at step {global_step}!")
+            logger.info(f" QUALITY THRESHOLD REACHED at step {global_step}!")
             logger.info(f"Acceptance rate: {current_acceptance_rate:.1%} (threshold: {min_acceptance:.1%})")
             logger.info("SWITCHING TO AUTOMATIC VERIFICATION MODE")
             logger.info("Model can now explore creative reasoning paths!")
@@ -473,7 +473,7 @@ def train_expert_iteration(config: Dict):
         eval_interval = config['training'].get('eval_steps', 50)
         if global_step % eval_interval == 0 and global_step > 0:
             logger.info("="*80)
-            logger.info(f"📊 Evaluation at step {global_step}")
+            logger.info(f" Evaluation at step {global_step}")
             
             # Validation loss
             val_loss = compute_validation_loss(model, tokenizer, eval_dataloader, device, max_eval_steps=20)

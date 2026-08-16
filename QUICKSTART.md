@@ -1,6 +1,10 @@
 # Quick Start Guide - Deep Reasoning LLM
-
-This guide will help you get started with training your own deep reasoning language model.
+This modal repo is something im open sourcing, so that all of us can contribite to the archeture and make it compete propietary modals out there and train our own modal on our own datasets. 
+The principle here is simple.
+- We all contribute to the archeture and make it one of the best.
+- we train the modal on our own datasets rather tha getting so called open source modals as their pretained weights. 
+- or if someone has trained this model on some largeer weights then anyone can load those weights and run the modal.
+- This guide will help you get started with training your own deep reasoning language model.
 
 ## Prerequisites
 
@@ -248,4 +252,4 @@ For production-quality training:
 - Model architecture: See `src/model/model.py`
 - Training code: See `src/training/trainer.py`
 
-Happy training! 🚀
+keep training.

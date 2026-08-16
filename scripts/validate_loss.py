@@ -37,7 +37,7 @@ def test_loss_computation():
     input_ids = torch.randint(0, 100, (batch_size, seq_len))
     
     # Test 1: Loss should be computed when labels provided
-    print("\n✓ Testing loss computation with labels...")
+    print("\n Testing loss computation with labels...")
     with torch.no_grad():
         outputs = model(input_ids=input_ids, labels=input_ids)
     
@@ -48,17 +48,17 @@ def test_loss_computation():
     print(f"  ✓ Loss computed correctly")
     
     # Test 2: No loss without labels
-    print("\n✓ Testing forward pass without labels...")
+    print("\n Testing forward pass without labels...")
     with torch.no_grad():
         outputs = model(input_ids=input_ids)
     
     assert outputs.loss is None, "Loss should be None without labels"
     assert outputs.logits.shape == (batch_size, seq_len, 100)
     print(f"  Logits shape: {outputs.logits.shape}")
-    print(f"  ✓ Forward pass without labels works")
+    print(f"   Forward pass without labels works")
     
     # Test 3: Verify label shifting (causal LM shifts labels by 1)
-    print("\n✓ Testing label shifting for causal LM...")
+    print("\n Testing label shifting for causal LM...")
     
     # Create known input/target pair
     input_ids = torch.tensor([[1, 2, 3, 4, 5]], dtype=torch.long)
@@ -71,7 +71,7 @@ def test_loss_computation():
     # Model should predict token N+1 from tokens 0 to N
     print(f"  Input tokens: {input_ids[0].tolist()}")
     print(f"  Expected prediction: [2, 3, 4, 5, ?] (shifted by 1)")
-    print(f"  ✓ Label shifting validated")
+    print(f"   Label shifting validated")
     
     return True
 
@@ -104,7 +104,7 @@ def test_padding_mask():
     
     labels = input_ids.clone()
     
-    print("\n✓ Testing loss with padded sequences...")
+    print("\n Testing loss with padded sequences...")
     with torch.no_grad():
         outputs = model(input_ids=input_ids, labels=labels)
     
@@ -117,7 +117,7 @@ def test_padding_mask():
     # Verify padding doesn't dominate loss
     assert not torch.isnan(outputs.loss), "Loss should not be NaN with padding"
     assert outputs.loss.item() > 0, "Loss should be positive even with padding"
-    print(f"  ✓ Padding handled correctly")
+    print(f"   Padding handled correctly")
     
     return True
 
@@ -144,7 +144,7 @@ def test_gradient_flow():
     input_ids = torch.randint(0, 100, (2, 10))
     labels = input_ids.clone()
     
-    print("\n✓ Testing backward pass...")
+    print("\n Testing backward pass...")
     
     # Forward pass
     outputs = model(input_ids=input_ids, labels=labels)
@@ -179,7 +179,7 @@ def test_gradient_flow():
     
     assert params_with_grad > 0, "No parameters received gradients"
     assert all(g > 0 for g in grad_norms[:10]), "Some gradients are zero (dead neurons?)"
-    print(f"  ✓ Gradients flow correctly")
+    print(f"  Gradients flow correctly")
     
     return True
 
@@ -198,7 +198,7 @@ def test_swiglu_activation():
     # Input should be split in half (gate and value)
     x = torch.randn(2, 4, 512)  # Will be split into 2 x (2, 4, 256)
     
-    print("\n✓ Testing SwiGLU activation...")
+    print("\n Testing SwiGLU activation...")
     output = swiglu(x)
     
     assert output.shape == (2, 4, 256), f"Expected (2, 4, 256), got {output.shape}"
@@ -212,7 +212,7 @@ def test_swiglu_activation():
     print(f"  Input shape: {x.shape}")
     print(f"  Output shape: {output.shape}")
     print(f"  Output variance: {variance:.6f}")
-    print(f"  ✓ SwiGLU activation working correctly")
+    print(f"   SwiGLU activation working correctly")
     
     return True
 
@@ -235,7 +235,7 @@ def test_causal_mask():
     model = ReasoningLLMForCausalLM(config)
     model.eval()
     
-    print("\n✓ Testing causal masking...")
+    print("\n Testing causal masking...")
     
     # Same input, different positions should give different outputs
     input_ids = torch.tensor([[1, 2, 3, 4, 5]])
@@ -265,7 +265,7 @@ def test_causal_mask():
     print(f"  Max difference: {diff:.8f}")
     
     assert diff < 1e-5, f"Causal masking broken! Difference: {diff}"
-    print(f"  ✓ Causal masking working correctly")
+    print(f"   Causal masking working correctly")
     
     return True
 
@@ -294,7 +294,7 @@ def test_loss_convergence():
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
     
-    print("\n✓ Testing loss convergence (10 SGD steps)...")
+    print("\n Testing loss convergence (10 SGD steps)...")
     
     losses = []
     for step in range(10):
@@ -320,7 +320,7 @@ def test_loss_convergence():
     
     assert final_loss < initial_loss, "Loss should decrease with training"
     assert reduction > 10, f"Loss should decrease by >10%, only decreased {reduction:.1f}%"
-    print(f"  ✓ Loss converges correctly")
+    print(f"  Loss converges correctly")
     
     return True
 
@@ -356,7 +356,7 @@ def main():
     
     all_passed = True
     for test_name, passed, error in results:
-        status = "✓ PASS" if passed else "✗ FAIL"
+        status = " PASS" if passed else " FAIL"
         print(f"{status}: {test_name}")
         if not passed:
             print(f"       Error: {error}")
@@ -365,17 +365,17 @@ def main():
     print("=" * 60)
     
     if all_passed:
-        print("\n🎉 ALL VALIDATION TESTS PASSED!")
+        print("\n ALL VALIDATION TESTS PASSED!")
         print("\nYour training setup is CORRECT:")
-        print("  ✓ Loss computation is accurate")
-        print("  ✓ Padding is handled correctly")
-        print("  ✓ Gradients flow properly")
-        print("  ✓ SwiGLU activation works")
-        print("  ✓ Causal masking is correct")
-        print("  ✓ Model can learn (loss decreases)")
-        print("\n✅ Safe to proceed with training!")
+        print("   Loss computation is accurate")
+        print("   Padding is handled correctly")
+        print("   Gradients flow properly")
+        print("   SwiGLU activation works")
+        print("   Causal masking is correct")
+        print("   Model can learn (loss decreases)")
+        print("\n Safe to proceed with training!")
     else:
-        print("\n⚠️  SOME TESTS FAILED!")
+        print("\n  SOME TESTS FAILED!")
         print("Fix issues before training to avoid wasted GPU time.")
         return 1
     

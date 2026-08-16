@@ -57,21 +57,21 @@ python scripts/train.py --config configs/base_config.yaml
 
 ## Features
 
-- ✅ Scalable transformer architecture
-- ✅ SentencePiece tokenizer with Unigram algorithm
-- ✅ SwiGLU activation (used in LLaMA, PaLM)
-- ✅ RoPE positional embeddings
-- ✅ Flexible configuration system
-- ✅ Mixed precision training (FP16/BF16)
-- ✅ Gradient accumulation
-- ✅ Distributed training support
-- ✅ Chain-of-thought training capabilities
-- ✅ Comprehensive logging and monitoring
+-  Scalable transformer architecture
+-  SentencePiece tokenizer with Unigram algorithm
+-  SwiGLU activation (used in LLaMA, PaLM)
+-  RoPE positional embeddings
+-  Flexible configuration system
+-  Mixed precision training (FP16/BF16)
+-  Gradient accumulation
+-  Distributed training support
+-  Chain-of-thought training capabilities
+-  Comprehensive logging and monitoring
 
 ## License
 
 MIT License
 =======
 # llm_self-attention
-created a 128million parameters thinking model from scratch with training from scratch loss convergence moving average plates to 1.9 on 25k 8 batch training. this is a scalable upto billions of parameters just change the configuration in base-config.yaml  &amp; use scaling_preset.yaml remember the model needs more training since we use randomization.
+## created a 128million parameters thinking model from scratch with training from scratch loss convergence moving average plates to 1.9 on 25k 8 batch training. this is a scalable upto billions of parameters just change the configuration in base-config.yaml  &amp; use scaling_preset.yaml remember the model needs more training since we use batched randomization so that modal generalizes and doesnt over fits despite having small number of parameters. we keep the number of paramaters small intentionally since the modal needs validation on every stage so that we can predict the modal and disciver its uniwue scaling laws. since modifying modal archeture when its smaller is easier than modifying its arch when the modal has grown larger. i suggest to push the parameters to 300-500 million ranger if your machine can handle it. 
 >>>>>>> 7cc2b760938a382bd277aaca66f6b679900efe50

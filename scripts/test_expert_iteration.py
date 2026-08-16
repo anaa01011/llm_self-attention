@@ -43,7 +43,7 @@ def test_dataset_mode_verifier():
     result = verifier.verify(generated, ground_truth, reference_thinking)
     
     assert result.passed, f"Should pass similar: {result.reason}"
-    print(f"✅ Similar reasoning: PASSED (score={result.score:.2f})")
+    print(f" Similar reasoning: PASSED (score={result.score:.2f})")
     
     # Test case 3: Wrong conclusion (should fail)
     generated = "<think>15 + 20 = 35, then 35 + 7 = 42</think><conclusion>45</conclusion>"
@@ -51,7 +51,7 @@ def test_dataset_mode_verifier():
     result = verifier.verify(generated, ground_truth, reference_thinking)
     
     assert not result.passed, "Should fail on wrong conclusion"
-    print(f"✅ Wrong conclusion: REJECTED (score={result.score:.2f})")
+    print(f" Wrong conclusion: REJECTED (score={result.score:.2f})")
     
     # Test case 4: Very different thinking (should fail in dataset mode)
     generated = "<think>Just calculated it</think><conclusion>42</conclusion>"
@@ -60,9 +60,9 @@ def test_dataset_mode_verifier():
     
     # In dataset mode with low similarity, should be rejected
     if not result.passed:
-        print(f"✅ Different thinking: REJECTED in dataset mode (score={result.score:.2f})")
+        print(f" Different thinking: REJECTED in dataset mode (score={result.score:.2f})")
     else:
-        print(f"⚠️  Different thinking: ACCEPTED (score={result.score:.2f}) - may need threshold adjustment")
+        print(f"  Different thinking: ACCEPTED (score={result.score:.2f}) - may need threshold adjustment")
     
     return True
 
@@ -83,7 +83,7 @@ def test_automatic_mode_verifier():
     result = verifier.verify(generated, ground_truth)
     
     assert result.passed, f"Should pass: {result.reason}"
-    print(f"✅ Valid reasoning: PASSED (score={result.score:.2f})")
+    print(f" Valid reasoning: PASSED (score={result.score:.2f})")
     
     # Test case 2: Creative but valid (should pass in automatic)
     generated = "<think>Breaking it down: 10+10+10+10+2 = 42</think><conclusion>42</conclusion>"
@@ -91,7 +91,7 @@ def test_automatic_mode_verifier():
     result = verifier.verify(generated, ground_truth)
     
     assert result.passed, f"Should pass creative: {result.reason}"
-    print(f"✅ Creative reasoning: PASSED (score={result.score:.2f})")
+    print(f" Creative reasoning: PASSED (score={result.score:.2f})")
     
     # Test case 3: Empty thinking (should fail)
     generated = "<think></think><conclusion>42</conclusion>"
@@ -99,7 +99,7 @@ def test_automatic_mode_verifier():
     result = verifier.verify(generated, ground_truth)
     
     assert not result.passed, "Should fail on empty thinking"
-    print(f"✅ Empty thinking: REJECTED (score={result.score:.2f})")
+    print(f" Empty thinking: REJECTED (score={result.score:.2f})")
     
     # Test case 4: Contradictory thinking (should fail)
     generated = "<think>15 + 27 = 50, wait no actually 42</think><conclusion>42</conclusion>"
@@ -107,7 +107,7 @@ def test_automatic_mode_verifier():
     result = verifier.verify(generated, ground_truth)
     
     assert not result.passed, "Should fail on contradiction"
-    print(f"✅ Contradictory: REJECTED (score={result.score:.2f})")
+    print(f" Contradictory: REJECTED (score={result.score:.2f})")
     
     # Test case 5: Wrong conclusion (should fail)
     generated = "<think>15 + 27 = 40</think><conclusion>40</conclusion>"
@@ -115,7 +115,7 @@ def test_automatic_mode_verifier():
     result = verifier.verify(generated, ground_truth)
     
     assert not result.passed, "Should fail on wrong answer"
-    print(f"✅ Wrong answer: REJECTED (score={result.score:.2f})")
+    print(f" Wrong answer: REJECTED (score={result.score:.2f})")
     
     return True
 
@@ -136,7 +136,7 @@ def test_math_verifier():
     result = verifier.verify(generated, ground_truth)
     
     assert result.passed, f"Should pass correct math: {result.reason}"
-    print(f"✅ Correct math: PASSED (score={result.score:.2f})")
+    print(f" Correct math: PASSED (score={result.score:.2f})")
     
     # Test case 2: Wrong intermediate step (should fail)
     generated = "<think>15 + 20 = 30, then 30 + 12 = 42</think><conclusion>42</conclusion>"
@@ -144,7 +144,7 @@ def test_math_verifier():
     result = verifier.verify(generated, ground_truth)
     
     assert not result.passed, "Should fail on wrong math steps"
-    print(f"✅ Wrong math steps: REJECTED (score={result.score:.2f})")
+    print(f" Wrong math steps: REJECTED (score={result.score:.2f})")
     
     # Test case 3: Correct conclusion but flawed math (should fail)
     generated = "<think>10 + 10 = 25, but answer is 42</think><conclusion>42</conclusion>"
@@ -152,7 +152,7 @@ def test_math_verifier():
     result = verifier.verify(generated, ground_truth)
     
     assert not result.passed, "Should fail on flawed math"
-    print(f"✅ Flawed math: REJECTED (score={result.score:.2f})")
+    print(f" Flawed math: REJECTED (score={result.score:.2f})")
     
     return True
 
@@ -182,7 +182,7 @@ def test_quality_scoring():
     assert scores[0] > scores[1], "Excellent should score higher than Good"
     assert scores[1] > scores[2], "Good should score higher than Basic"
     
-    print(f"✅ Quality scoring works correctly")
+    print(f" Quality scoring works correctly")
     
     return True
 
@@ -214,7 +214,7 @@ def test_mode_switching():
     # Automatic mode should be more lenient
     assert result_auto.score >= result_dataset.score, "Automatic should be more lenient"
     
-    print(f"✅ Mode switching works correctly")
+    print(f" Mode switching works correctly")
     
     return True
 
@@ -252,12 +252,12 @@ def main():
     print("="*80)
     
     if failed == 0:
-        print("\n🎉 All tests passed! Expert Iteration system is ready.")
-        print("\n✅ You can now train with:")
+        print("\n All tests passed! Expert Iteration system is ready.")
+        print("\n You can now train with:")
         print("   ./myenv/bin/python scripts/train.py --config configs/test_config.yaml")
         return 0
     else:
-        print(f"\n⚠️  {failed} test(s) failed. Please fix before training.")
+        print(f"\n  {failed} test(s) failed. Please fix before training.")
         return 1
 
 

@@ -24,8 +24,8 @@ def cleanup_checkpoints():
     print("=" * 60)
     print("Cleaning Up Local Checkpoints")
     print("=" * 60)
-    print("\n⚠️  This will delete all local checkpoints to free Mac storage.")
-    print("✅ Checkpoints are safely stored in HuggingFace Hub:")
+    print("\n  This will delete all local checkpoints to free Mac storage.")
+    print(" Checkpoints are safely stored in HuggingFace Hub:")
     print("   https://huggingface.co/anaa01011/reasoning-llm-checkpoints")
     print()
     
@@ -51,7 +51,7 @@ def cleanup_checkpoints():
             size_mb = get_dir_size(checkpoint)
             try:
                 shutil.rmtree(checkpoint)
-                print(f"🗑️  Deleted: {checkpoint} (freed {size_mb} MB)")
+                print(f"  Deleted: {checkpoint} (freed {size_mb} MB)")
                 total_freed += size_mb
                 total_deleted += 1
             except Exception as e:
@@ -65,7 +65,7 @@ def cleanup_checkpoints():
     else:
         print("✓ No checkpoints found - Mac already clean!")
     print("=" * 60)
-    print("\n💾 Your checkpoints are safe in HuggingFace Hub.")
+    print("\n Your checkpoints are safe in HuggingFace Hub.")
     print("   Download anytime with:")
     print("   from huggingface_hub import snapshot_download")
     print("   snapshot_download(repo_id='anaa01011/reasoning-llm-checkpoints')")

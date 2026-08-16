@@ -212,12 +212,15 @@ def create_dataloader(
     Returns:
         DataLoader instance
     """
+    # pin_memory is only supported on CUDA; disable for MPS and CPU
+    import torch
+    effective_pin_memory = pin_memory and torch.cuda.is_available()
     return DataLoader(
         dataset,
         batch_size=batch_size,
         shuffle=shuffle,
         num_workers=num_workers,
-        pin_memory=pin_memory,
+        pin_memory=effective_pin_memory,
         drop_last=True,  # Drop last incomplete batch
     )
 

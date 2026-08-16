@@ -54,7 +54,7 @@ def test_gqa_forward_pass():
     assert kv_cache[1].shape == (batch_size, config.num_key_value_heads, seq_len, config.head_dim), \
         f"Value cache shape mismatch: {kv_cache[1].shape}"
     
-    print(f"✅ Forward pass successful")
+    print(f" Forward pass successful")
     print(f"   Input shape: {hidden_states.shape}")
     print(f"   Output shape: {output.shape}")
     print(f"   KV cache shapes: K={kv_cache[0].shape}, V={kv_cache[1].shape}")
@@ -101,7 +101,7 @@ def test_gradient_flow():
     k_grad_norm = attn.k_proj.weight.grad.norm().item()
     v_grad_norm = attn.v_proj.weight.grad.norm().item()
     
-    print(f"✅ Gradients flow correctly")
+    print(f" Gradients flow correctly")
     print(f"   Q projection grad norm: {q_grad_norm:.4f}")
     print(f"   K projection grad norm: {k_grad_norm:.4f}")
     print(f"   V projection grad norm: {v_grad_norm:.4f}")
@@ -150,7 +150,7 @@ def test_kv_cache():
     # Validate cache shapes grow correctly
     assert kv_cache[0].shape[2] == 3, f"Cache should have 3 tokens, got {kv_cache[0].shape[2]}"
     
-    print(f"✅ KV cache works correctly")
+    print(f" KV cache works correctly")
     print(f"   Token 1 cache: {1} positions")
     print(f"   Token 2 cache: {2} positions")
     print(f"   Token 3 cache: {3} positions")
@@ -191,7 +191,7 @@ def test_flash_attention_toggle():
     # Outputs should be similar (not identical due to numerical differences)
     diff = (output_flash - output_fallback).abs().max().item()
     
-    print(f"✅ Both Flash Attention and fallback work")
+    print(f" Both Flash Attention and fallback work")
     print(f"   Flash Attention enabled: {attn_flash.use_flash_attention}")
     print(f"   Fallback enabled: {attn_fallback.use_flash_attention}")
     print(f"   Max output difference: {diff:.6f}")
@@ -233,7 +233,7 @@ def test_transformer_block():
     assert output.shape == hidden_states.shape, f"Shape mismatch: {output.shape}"
     assert kv_cache is not None, "KV cache missing"
     
-    print(f"✅ TransformerBlock works with GQA")
+    print(f" TransformerBlock works with GQA")
     print(f"   Input shape: {hidden_states.shape}")
     print(f"   Output shape: {output.shape}")
     print(f"   Attention: GroupedQueryAttention")
@@ -273,11 +273,11 @@ def main():
     print("="*80)
     
     if failed == 0:
-        print("\n🎉 All tests passed! GQA + Flash Attention 2 implementation is ready.")
-        print("\n✅ Safe to proceed with training")
+        print("\n All tests passed! GQA + Flash Attention 2 implementation is ready.")
+        print("\n Safe to proceed with training")
         return 0
     else:
-        print(f"\n⚠️  {failed} test(s) failed. Please fix before training.")
+        print(f"\n  {failed} test(s) failed. Please fix before training.")
         return 1
 
 

@@ -12,7 +12,7 @@ from typing import Optional, Dict, Any
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import GradScaler
 from torch.utils.tensorboard import SummaryWriter
 from transformers import get_scheduler
 from tqdm import tqdm
@@ -73,8 +73,13 @@ class Trainer:
         
         self.config = {**default_config, **(config or {})}
         
-        # Setup device
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # Setup device: prefer CUDA > MPS (Apple Silicon) > CPU
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        elif torch.backends.mps.is_available():
+            self.device = torch.device("mps")
+        else:
+            self.device = torch.device("cpu")
         self.model.to(self.device)
         
         # Setup optimizer
@@ -84,8 +89,22 @@ class Trainer:
         self.scheduler = self._create_scheduler()
         
         # Setup mixed precision training
-        self.scaler = GradScaler() if self.config["fp16"] else None
-        self.use_amp = self.config["fp16"] or self.config["bf16"]
+        # GradScaler only works on CUDA; MPS/CPU use autocast without scaler
+        self.scaler = GradScaler("cuda") if (self.config["fp16"] and self.device.type == "cuda") else None
+        # MPS: autocast is still experimental and causes CPU fallback for unsupported ops;
+        # train in float32 on MPS for correctness and speed.
+        if self.device.type == "mps":
+            self.amp_dtype = torch.float32
+            self.use_amp = False
+        elif self.config["bf16"]:
+            self.amp_dtype = torch.bfloat16
+            self.use_amp = self.device.type == "cuda"  # BF16 autocast only meaningful on CUDA
+        elif self.config["fp16"]:
+            self.amp_dtype = torch.float16
+            self.use_amp = self.device.type == "cuda"
+        else:
+            self.amp_dtype = torch.float32
+            self.use_amp = False
         
         # Setup logging
         self.writer = SummaryWriter(log_dir=self.config["log_dir"])
@@ -101,7 +120,7 @@ class Trainer:
         print("Trainer Initialized")
         print("=" * 60)
         print(f"Device: {self.device}")
-        print(f"Mixed Precision: {'FP16' if self.config['fp16'] else 'BF16' if self.config['bf16'] else 'FP32'}")
+        print(f"Mixed Precision: {'FP16' if self.config['fp16'] else 'BF16' if (self.config['bf16'] and self.use_amp) else 'FP32'}")
         print(f"Gradient Accumulation Steps: {self.config['gradient_accumulation_steps']}")
         print(f"Learning Rate: {self.config['learning_rate']}")
         print(f"Max Steps: {self.config['max_steps']}")
@@ -147,7 +166,7 @@ class Trainer:
         batch = {k: v.to(self.device) for k, v in batch.items()}
         
         # Forward pass with mixed precision
-        with autocast(enabled=self.use_amp):
+        with torch.amp.autocast(device_type=self.device.type, dtype=self.amp_dtype, enabled=self.use_amp):
             outputs = self.model(**batch)
             loss = outputs.loss
             
@@ -200,7 +219,7 @@ class Trainer:
         for batch in tqdm(self.eval_dataloader, desc="Evaluating"):
             batch = {k: v.to(self.device) for k, v in batch.items()}
             
-            with autocast(enabled=self.use_amp):
+            with torch.amp.autocast(device_type=self.device.type, dtype=self.amp_dtype, enabled=self.use_amp):
                 outputs = self.model(**batch)
                 loss = outputs.loss
             
@@ -255,10 +274,11 @@ class Trainer:
             key=lambda x: int(x.name.split("-")[1])
         )
         
-        save_total_limit = self.config.get("save_total_limit", 1)
+        save_total_limit = self.config.get("save_total_limit", 2)
         
-        # Delete oldest checkpoints, keep only (limit - 1) to make room for new one
-        checkpoints_to_delete = checkpoints[:-save_total_limit + 1] if len(checkpoints) >= save_total_limit else []
+        # Delete oldest checkpoints to make room for the new one about to be saved
+        # Target: keep (save_total_limit - 1) existing ones so total = save_total_limit after save
+        checkpoints_to_delete = checkpoints[:max(0, len(checkpoints) - (save_total_limit - 1))]
         
         for checkpoint in checkpoints_to_delete:
             try:
@@ -276,7 +296,7 @@ class Trainer:
             return
         
         hub_repo_id = self.config.get("hub_repo_id")
-        hub_token = self.config.get("hub_token")
+        hub_token = self.config.get("hub_token") or os.environ.get("HF_TOKEN")
         
         if not hub_repo_id or not hub_token:
             print("⚠️  HuggingFace Hub repo_id or token not configured")

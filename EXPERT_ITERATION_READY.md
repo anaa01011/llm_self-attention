@@ -1,14 +1,14 @@
-# Expert Iteration Training - Ready to Start! 🚀
+# Expert Iteration Training (this doc explains the expert iteration setup be carefull with this, we train this bloody model on three phases first is loss drop around stable base lines towards verified mal,mel.)
 
-## What's Been Set Up
+## What's Been Set Up here?
 
 ### 1. **Training Configuration**
-- ✅ Expert iteration **ENABLED**
-- ✅ Initial mode: **Dataset comparison** (first 100 steps)
-- ✅ Auto-switch to **Automatic mode** at step 100
-- ✅ Generate **6 samples** per question
-- ✅ Keep **top 3** for training (50% filter)
-- ✅ Similarity threshold: **0.4** (40% word overlap)
+-  Expert iteration **ENABLED**
+-  Initial mode: **Dataset comparison** (first 100 steps)
+-  Auto-switch to **Automatic mode** at step 100
+-  Generate **6 samples** per question
+-  Keep **top 3** for training (50% filter)
+-  Similarity threshold: **0.4** (40% word overlap)
 
 ### 2. **Training Parameters**
 - Max steps: **200** (quick test run)
@@ -122,7 +122,7 @@ Step 10: Loading question...
 
 Checkpoints saved to:
 - Local: `checkpoints/test_run/checkpoint-100`, `checkpoint-200`
-- HuggingFace Hub: Auto-uploaded (Mac storage protected!)
+- HuggingFace Hub: Auto-uploaded (my Mac storage protected if yoyre forking this then protect yours as well)
 
 ## Monitoring
 
@@ -157,13 +157,13 @@ tensorboard --logdir logs/test_run
 
 ## Architecture Benefits
 
-Your model now has:
+  this model now has:
 - ✅ **GQA** (3x smaller KV cache)
 - ✅ **Flash Attention 2** (2-3x faster inference)  
 - ✅ **Expert Iteration** (10x faster learning)
 - ✅ **Self-correction** (Claude-style quality)
 
-**This is a state-of-the-art 2024-2026 training pipeline!**
+**This is a state-of-the-art 2024-2026 training pipeline tbh**
 
 ## Ready?
 
@@ -172,4 +172,4 @@ Just run:
 ./myenv/bin/python scripts/train_expert_iteration.py
 ```
 
-Watch your model learn to reason! 🧠✨
+## Watch the model learn to reason the process should be slow and steady if you start seeing the formatiion of text too quickly dont get confused "omg my model is finally becoming omnius of dune" rather it could be sign of memorization due to overfitting rather than generalization so always trust the data not the output.

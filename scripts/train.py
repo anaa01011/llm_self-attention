@@ -7,11 +7,22 @@ Usage:
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Load .env file if present (for HF_TOKEN etc.)
+_env_file = Path(__file__).parent.parent / ".env"
+if _env_file.exists():
+    with open(_env_file) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip())
 
 import torch
 from src.model import ReasoningLLMConfig, ReasoningLLMForCausalLM
@@ -64,7 +75,7 @@ def main():
     # Load tokenizer
     print("Loading tokenizer...")
     tokenizer = load_tokenizer(args.tokenizer_path)
-    print(f"✓ Tokenizer loaded with vocab size: {tokenizer.vocab_size}")
+    print(f" Tokenizer loaded with vocab size: {tokenizer.vocab_size}")
     
     # Create model configuration
     print("\nCreating model configuration...")
@@ -126,8 +137,8 @@ def main():
         num_workers=config["data"]["num_workers"],
     )
     
-    print(f"✓ Training samples: {len(train_dataset):,}")
-    print(f"✓ Evaluation samples: {len(eval_dataset):,}")
+    print(f" Training samples: {len(train_dataset):,}")
+    print(f" Evaluation samples: {len(eval_dataset):,}")
     
     # Create training configuration
     training_config = {
@@ -156,7 +167,7 @@ def main():
         print("\n\nTraining interrupted by user")
         print("Saving checkpoint...")
         trainer.save_checkpoint(trainer.global_step)
-        print("✓ Checkpoint saved")
+        print(" Checkpoint saved")
     
     print("\n" + "=" * 60)
     print("Training completed successfully!")

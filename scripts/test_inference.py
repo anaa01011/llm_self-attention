@@ -68,7 +68,7 @@ def test_inference(checkpoint_path="checkpoints/test_run/checkpoint-200"):
         print("-" * 60)
     
     print("\n" + "=" * 60)
-    print("✓ Inference test complete!")
+    print(" Inference test complete!")
     print("=" * 60)
     print("\nNote: This is a very early checkpoint (200 steps).")
     print("Expect basic token patterns, not coherent reasoning yet.")

@@ -23,9 +23,9 @@ def test_imports():
     try:
         from src.model import ReasoningLLMConfig, ReasoningLLMForCausalLM
         from src.utils import set_seed, count_parameters
-        print("✓ Model imports successful")
+        print("yep Model imports successful")
     except ImportError as e:
-        print(f"✗ Import error: {e}")
+        print(f"nope Import error: {e}")
         return False
     
     try:
@@ -33,7 +33,7 @@ def test_imports():
         import sentencepiece
         print("✓ External dependencies available")
     except ImportError as e:
-        print(f"✗ Missing dependency: {e}")
+        print(f"nope Missing dependency: {e}")
         return False
     
     return True
@@ -75,14 +75,14 @@ def test_model_creation():
         expected_max = 125_000_000
         
         if expected_min <= params['total'] <= expected_max:
-            print(f"✓ Parameter count is in expected range ({expected_min/1e6:.0f}M - {expected_max/1e6:.0f}M)")
+            print(f"yep Parameter count is in expected range ({expected_min/1e6:.0f}M - {expected_max/1e6:.0f}M)")
         else:
             print(f"⚠ Warning: Parameter count outside expected range")
         
         return True
         
     except Exception as e:
-        print(f"✗ Model creation failed: {e}")
+        print(f"nope Model creation failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -120,16 +120,16 @@ def test_forward_pass():
         # Check output shape
         expected_shape = (batch_size, seq_length, 1000)
         if outputs.logits.shape == expected_shape:
-            print(f"✓ Forward pass successful")
+            print(f"yep Forward pass successful")
             print(f"  Input shape: {input_ids.shape}")
             print(f"  Output shape: {outputs.logits.shape}")
             return True
         else:
-            print(f"✗ Unexpected output shape: {outputs.logits.shape}")
+            print(f"nope Unexpected output shape: {outputs.logits.shape}")
             return False
             
     except Exception as e:
-        print(f"✗ Forward pass failed: {e}")
+        print(f"nope Forward pass failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -140,17 +140,17 @@ def test_device():
     print("\nTesting device availability...")
     
     if torch.cuda.is_available():
-        print(f"✓ CUDA available")
+        print(f"yep CUDA available")
         print(f"  Device: {torch.cuda.get_device_name(0)}")
         print(f"  CUDA version: {torch.version.cuda}")
         print(f"  Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
     else:
-        print("⚠ CUDA not available - will use CPU")
+        print("nope CUDA not available - will use CPU")
         print("  Training on CPU will be very slow")
         print("  Consider using a GPU for training")
     
     if torch.backends.mps.is_available():
-        print("✓ MPS (Apple Silicon) available")
+        print("yep MPS (Apple Silicon) available")
     
     return True
 
@@ -171,9 +171,9 @@ def test_configuration_files():
     for config_file in config_files:
         path = Path(config_file)
         if path.exists():
-            print(f"✓ {config_file}")
+            print(f"yes {config_file}")
         else:
-            print(f"✗ Missing: {config_file}")
+            print(f"nope Missing: {config_file}")
             all_exist = False
     
     return all_exist
@@ -215,7 +215,7 @@ def main():
     print("=" * 60)
     
     if all_passed:
-        print("\n🎉 All tests passed! Your setup is ready.")
+        print("\n All tests passed! Your setup is ready.")
         print("\nNext steps:")
         print("1. Prepare your training data or use sample data:")
         print("   python scripts/prepare_sample_data.py")

@@ -489,3 +489,4 @@ class ReasoningLLMForCausalLM(ReasoningLLMPreTrainedModel, GenerationMixin):
             "use_cache": kwargs.get("use_cache"),
             "attention_mask": attention_mask,
         }
+        
